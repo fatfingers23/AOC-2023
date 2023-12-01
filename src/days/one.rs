@@ -19,6 +19,21 @@ mod day_one {
     }
 
     #[tokio::test]
+    async fn sample_one() {
+        let filename = "src/flat_files/test_data/one/sample_one.txt";
+        let contents = fs::read_to_string(filename)
+            .expect("Something went wrong reading the file");
+
+        let mut calibration_total: i32 = 0;
+        for line in contents.lines() {
+
+            calibration_total += calculate_string_cal_value(line);
+        }
+        println!("Calibration Total: {}", calibration_total);
+        assert_eq!(calibration_total, 142);
+    }
+
+    #[tokio::test]
     async fn one() {
         let filename = "src/flat_files/day_one_pt_one.txt";
         let contents = fs::read_to_string(filename)
@@ -26,21 +41,6 @@ mod day_one {
 
         let mut calibration_total: i32 = 0;
         for line in contents.lines() {
-            calibration_total += calculate_string_cal_value(line);
-        }
-        println!("Calibration Total: {}", calibration_total);
-        assert_eq!(calibration_total, 54_916);
-    }
-
-    #[tokio::test]
-    async fn sample_one() {
-        let filename = "src/flat_files/day_one_pt_one.txt";
-        let contents = fs::read_to_string(filename)
-            .expect("Something went wrong reading the file");
-
-        let mut calibration_total: i32 = 0;
-        for line in contents.lines() {
-
             calibration_total += calculate_string_cal_value(line);
         }
         println!("Calibration Total: {}", calibration_total);
@@ -121,12 +121,8 @@ mod day_one {
     #[tokio::test]
     async fn two() {
         let filename = "src/flat_files/day_one_pt_one.txt";
-        // let filename = "src/flat_files/test_data/sample_two.txt";
         let pt_two_calibration_total = pt_two_solution(filename.to_string());
         println!("Calibration Total: {}", pt_two_calibration_total);
         assert_eq!(pt_two_calibration_total, 54_728);
     }
-
-
-
 }
