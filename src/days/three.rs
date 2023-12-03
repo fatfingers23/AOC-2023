@@ -43,7 +43,6 @@ mod day_two {
                             loc: char_index,
                         };
                         symbol_details.push(symbol_detail);
-                        // print!("{:?}\n", symbol_detail);
                     }
 
                     if number_as_string.len() > 0 {
@@ -165,17 +164,51 @@ mod day_two {
 
             if is_there_an_adjacent_symbol {
                 schematic_part_number_sum += part_number_detail.part_number;
-            } else {
-                println!("{:?}", part_number_detail);
             }
         }
         schematic_part_number_sum
     }
 
     fn day_two_pt_two_solution(file_content: String) -> i32 {
-        let mut game_lowest_pow_sum = 0;
+        let mut gear_ratio_sum = 0;
+        let schematic = schematic_parser(file_content);
+        let gears = schematic
+            .symbol_details
+            .iter()
+            .filter(|symbol_detail| symbol_detail.symbol == "*")
+            .collect::<Vec<&SymbolDetail>>();
 
-        game_lowest_pow_sum
+        for gear in gears {
+            let numbers_near = schematic
+                .part_number_details
+                .iter()
+                .filter(|part_number_detail| {
+                    part_number_detail.line_number == gear.line_number - 1
+                        || part_number_detail.line_number == gear.line_number + 1
+                        || part_number_detail.line_number == gear.line_number
+                })
+                .collect::<Vec<&PartNumberDetail>>();
+
+            let mut possible_numbers: Vec<PartNumberDetail> = Vec::new();
+            for number in numbers_near {
+                let valid = get_line_valid_positions(number.start_loc, number.end_loc);
+
+                if number.line_number != gear.line_number {
+                    if valid.contains(&gear.loc) {
+                        possible_numbers.push(number.clone());
+                    }
+                } else {
+                    if same_line_check(number.clone(), vec![gear]) {
+                        possible_numbers.push(number.clone());
+                    }
+                }
+            }
+            if possible_numbers.len() == 2 {
+                gear_ratio_sum += possible_numbers[0].part_number * possible_numbers[1].part_number;
+            }
+            println!("{:?}", possible_numbers);
+        }
+        gear_ratio_sum
     }
 
     #[tokio::test]
@@ -194,19 +227,19 @@ mod day_two {
         assert_eq!(valid_part_numbers_sum, 530_495);
     }
     //
-    // #[tokio::test]
-    // async fn sample_two() {
-    //     let filename = "src/flat_files/test_data/two/sample_two.txt";
-    //     let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
-    //     let possible_games_ids_total = day_two_pt_two_solution(contents);
-    //     assert_eq!(possible_games_ids_total, 2_286);
-    // }
-    //
-    // #[tokio::test]
-    // async fn two() {
-    //     let filename = "src/flat_files/day_two.txt";
-    //     let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
-    //     let possible_games_ids_total = day_two_pt_two_solution(contents);
-    //     assert_eq!(possible_games_ids_total, 54_911);
-    // }
+    #[tokio::test]
+    async fn sample_two() {
+        let filename = "src/flat_files/test_data/three/sample_one.txt";
+        let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
+        let gear_ratio_sum = day_two_pt_two_solution(contents);
+        assert_eq!(gear_ratio_sum, 467_835);
+    }
+
+    #[tokio::test]
+    async fn two() {
+        let filename = "src/flat_files/day_three.txt";
+        let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
+        let gear_ratio_sum = day_two_pt_two_solution(contents);
+        assert_eq!(gear_ratio_sum, 80_253_814);
+    }
 }
