@@ -57,19 +57,26 @@ mod day_two {
         game
     }
 
+    fn grab_game_id(game_string: &str) -> i32 {
+        let get_id_regex = regex::Regex::new(r"Game\s(\d+)").unwrap();
+        let game_id_split = game_string.split(":").collect::<Vec<&str>>();
+        let game_id = get_id_regex
+            .captures(game_id_split[0])
+            .unwrap()
+            .get(1)
+            .unwrap()
+            .as_str()
+            .parse::<i32>()
+            .unwrap();
+        game_id
+    }
+
     fn day_two_pt_one_solution(file_content: String) -> i32 {
         let mut possible_games_ids_total = 0;
-        let get_id_regex = regex::Regex::new(r"Game\s(\d+)").unwrap();
+
         for line in file_content.lines() {
             let game_id_split = line.split(":").collect::<Vec<&str>>();
-            let game_id = get_id_regex
-                .captures(game_id_split[0])
-                .unwrap()
-                .get(1)
-                .unwrap()
-                .as_str()
-                .parse::<i32>()
-                .unwrap();
+            let game_id = grab_game_id(game_id_split[0]);
             let parsed_game = parse_game(game_id_split[1], game_id);
             let mut valid_game = true;
 
@@ -86,13 +93,38 @@ mod day_two {
             }
 
             if valid_game {
-                println!("Valid: Parsed Game: {:?}", parsed_game);
                 possible_games_ids_total += game_id;
-            } else {
-                println!("Parsed Game: {:?}", parsed_game);
             }
         }
         possible_games_ids_total
+    }
+
+    fn day_two_pt_two_solution(file_content: String) -> i32 {
+        let mut game_lowest_pow_sum = 0;
+
+        for line in file_content.lines() {
+            let game_id_split = line.split(":").collect::<Vec<&str>>();
+            let game_id = grab_game_id(game_id_split[0]);
+            let parsed_game = parse_game(game_id_split[1], game_id);
+
+            let mut lowest_red_cubes = parsed_game.grabs.get(0).unwrap().red_cubes;
+            let mut lowest_green_cubes = parsed_game.grabs.get(0).unwrap().green_cubes;
+            let mut lowest_blue_cubes = parsed_game.grabs.get(0).unwrap().blue_cubes;
+
+            for grab in parsed_game.grabs.iter() {
+                if grab.red_cubes > lowest_red_cubes {
+                    lowest_red_cubes = grab.red_cubes;
+                }
+                if grab.green_cubes > lowest_green_cubes {
+                    lowest_green_cubes = grab.green_cubes;
+                }
+                if grab.blue_cubes > lowest_blue_cubes {
+                    lowest_blue_cubes = grab.blue_cubes;
+                }
+            }
+            game_lowest_pow_sum += lowest_red_cubes * lowest_green_cubes * lowest_blue_cubes;
+        }
+        game_lowest_pow_sum
     }
 
     #[tokio::test]
@@ -104,11 +136,27 @@ mod day_two {
     }
 
     #[tokio::test]
-    async fn two() {
+    async fn one() {
         let filename = "src/flat_files/day_two.txt";
         let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
         let possible_games_ids_total = day_two_pt_one_solution(contents);
         println!("{}", possible_games_ids_total);
         assert_eq!(possible_games_ids_total, 2_476);
+    }
+
+    #[tokio::test]
+    async fn sample_two() {
+        let filename = "src/flat_files/test_data/two/sample_two.txt";
+        let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
+        let possible_games_ids_total = day_two_pt_two_solution(contents);
+        assert_eq!(possible_games_ids_total, 2_286);
+    }
+
+    #[tokio::test]
+    async fn two() {
+        let filename = "src/flat_files/day_two.txt";
+        let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
+        let possible_games_ids_total = day_two_pt_two_solution(contents);
+        assert_eq!(possible_games_ids_total, 54_911);
     }
 }
