@@ -8,11 +8,14 @@ mod day_one {
         if digits.len() == 1 {
             let double_up = format!("{}{}", digits, digits);
             calibration_value = double_up.parse::<i32>().unwrap();
-        }
-        else {
+        } else {
             let digits_split = digits.chars();
             let digits_split = digits_split.collect::<Vec<char>>();
-            let string_cal_value = format!("{}{}", digits_split[0],  digits_split[digits_split.len() - 1]);
+            let string_cal_value = format!(
+                "{}{}",
+                digits_split[0],
+                digits_split[digits_split.len() - 1]
+            );
             calibration_value = string_cal_value.parse::<i32>().unwrap();
         }
         calibration_value
@@ -21,12 +24,10 @@ mod day_one {
     #[tokio::test]
     async fn sample_one() {
         let filename = "src/flat_files/test_data/one/sample_one.txt";
-        let contents = fs::read_to_string(filename)
-            .expect("Something went wrong reading the file");
+        let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
 
         let mut calibration_total: i32 = 0;
         for line in contents.lines() {
-
             calibration_total += calculate_string_cal_value(line);
         }
         println!("Calibration Total: {}", calibration_total);
@@ -35,9 +36,8 @@ mod day_one {
 
     #[tokio::test]
     async fn one() {
-        let filename = "src/flat_files/day_one_pt_one.txt";
-        let contents = fs::read_to_string(filename)
-            .expect("Something went wrong reading the file");
+        let filename = "src/flat_files/day_one.txt";
+        let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
 
         let mut calibration_total: i32 = 0;
         for line in contents.lines() {
@@ -46,7 +46,6 @@ mod day_one {
         println!("Calibration Total: {}", calibration_total);
         assert_eq!(calibration_total, 54_916);
     }
-
 
     fn get_numbers_in_words() -> HashMap<String, i32> {
         let mut numbers_in_words: HashMap<String, i32> = HashMap::new();
@@ -64,11 +63,9 @@ mod day_one {
         numbers_in_words
     }
 
-
     /// The actual solution as a method to use on sample list as well
-    fn pt_two_solution(file_loc: String) -> i32{
-        let contents = fs::read_to_string(file_loc)
-            .expect("Something went wrong reading the file");
+    fn pt_two_solution(file_loc: String) -> i32 {
+        let contents = fs::read_to_string(file_loc).expect("Something went wrong reading the file");
         let mut calibration_total: i32 = 0;
         let numbers_in_words = get_numbers_in_words();
 
@@ -100,11 +97,14 @@ mod day_one {
             sorted_cal.sort_by(|a, b| a.0.cmp(b.0));
 
             //Creates a string representation of the first and last values in the string to get the value
-            let string_cal_value = format!("{}{}", sorted_cal.first().unwrap().1, sorted_cal.last().unwrap().1);
+            let string_cal_value = format!(
+                "{}{}",
+                sorted_cal.first().unwrap().1,
+                sorted_cal.last().unwrap().1
+            );
 
             let line_cal_value = string_cal_value.parse::<i32>().unwrap();
             calibration_total += line_cal_value;
-
         }
 
         calibration_total
@@ -120,7 +120,7 @@ mod day_one {
 
     #[tokio::test]
     async fn two() {
-        let filename = "src/flat_files/day_one_pt_one.txt";
+        let filename = "src/flat_files/day_one.txt";
         let pt_two_calibration_total = pt_two_solution(filename.to_string());
         println!("Calibration Total: {}", pt_two_calibration_total);
         assert_eq!(pt_two_calibration_total, 54_728);

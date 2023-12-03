@@ -1,16 +1,13 @@
 mod day_two {
-    use std::collections::HashMap;
     use std::fs;
-
 
     const RED_CUBES: i32 = 12;
     const GREEN_CUBES: i32 = 13;
     const BLUE_CUBES: i32 = 14;
 
-
     #[derive(Debug)]
-    struct  Game {
-        pub game_id: i32,
+    struct Game {
+        pub _game_id: i32,
         pub grabs: Vec<GameGrab>,
     }
 
@@ -21,14 +18,12 @@ mod day_two {
         pub blue_cubes: i32,
     }
 
-
-
     fn parse_game(game_string: &str, game_id: i32) -> Game {
-        let  get_number_and_color_regex = regex::Regex::new(r"(\d+)\s(\w+)").unwrap();
+        let get_number_and_color_regex = regex::Regex::new(r"(\d+)\s(\w+)").unwrap();
         let grabs_split = game_string.split(";").collect::<Vec<&str>>();
 
         let mut game = Game {
-            game_id,
+            _game_id: game_id,
             grabs: vec![],
         };
         for grab in grabs_split {
@@ -62,25 +57,30 @@ mod day_two {
         game
     }
 
-
-    fn day_two_pt_one_solution(file_content: String) -> i32{
+    fn day_two_pt_one_solution(file_content: String) -> i32 {
         let mut possible_games_ids_total = 0;
         let get_id_regex = regex::Regex::new(r"Game\s(\d+)").unwrap();
         for line in file_content.lines() {
             let game_id_split = line.split(":").collect::<Vec<&str>>();
-            let game_id = get_id_regex.captures(game_id_split[0]).unwrap().get(1).unwrap().as_str().parse::<i32>().unwrap();
+            let game_id = get_id_regex
+                .captures(game_id_split[0])
+                .unwrap()
+                .get(1)
+                .unwrap()
+                .as_str()
+                .parse::<i32>()
+                .unwrap();
             let parsed_game = parse_game(game_id_split[1], game_id);
             let mut valid_game = true;
 
             for grab in parsed_game.grabs.iter() {
-
-                if grab.red_cubes > RED_CUBES{
+                if grab.red_cubes > RED_CUBES {
                     valid_game = false;
                 }
-                if grab.green_cubes > GREEN_CUBES{
+                if grab.green_cubes > GREEN_CUBES {
                     valid_game = false;
                 }
-                if grab.blue_cubes > BLUE_CUBES{
+                if grab.blue_cubes > BLUE_CUBES {
                     valid_game = false;
                 }
             }
@@ -88,33 +88,27 @@ mod day_two {
             if valid_game {
                 println!("Valid: Parsed Game: {:?}", parsed_game);
                 possible_games_ids_total += game_id;
-            }else{
+            } else {
                 println!("Parsed Game: {:?}", parsed_game);
             }
-
         }
         possible_games_ids_total
     }
 
-
-
     #[tokio::test]
     async fn sample_one() {
         let filename = "src/flat_files/test_data/two/sample_one.txt";
-        let contents = fs::read_to_string(filename)
-            .expect("Something went wrong reading the file");
+        let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
         let possible_games_ids_total = day_two_pt_one_solution(contents);
         assert_eq!(possible_games_ids_total, 8);
     }
 
     #[tokio::test]
     async fn two() {
-        let filename = "src/flat_files/day_two_pt_one.txt";
-        let contents = fs::read_to_string(filename)
-            .expect("Something went wrong reading the file");
+        let filename = "src/flat_files/day_two.txt";
+        let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
         let possible_games_ids_total = day_two_pt_one_solution(contents);
         println!("{}", possible_games_ids_total);
         assert_eq!(possible_games_ids_total, 2_476);
     }
-
 }
